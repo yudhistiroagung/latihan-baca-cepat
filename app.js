@@ -141,7 +141,7 @@ function finishQuiz() {
   quizState.questions.forEach((q, i) => {
     const row = document.createElement("div");
     row.className = "result-item";
-    row.innerHTML = `<div>${q}</div><div>${timings[i].toFixed(2)} dtk</div><div>${scores[i]}</div><div>${quizState.goalSeconds} dtk</div><div>${i + 1}</div>`;
+    row.innerHTML = `<div>${i + 1}</div><div>${q}</div><div>${timings[i].toFixed(2)} dtk</div><div>${scores[i]}</div><div>${quizState.goalSeconds} dtk</div>`;
     perQuestionList.appendChild(row);
   });
   saveResult({
@@ -224,13 +224,50 @@ async function loadDashboard() {
   all.slice(0, 10).forEach((r) => {
     const row = document.createElement("div");
     row.className = "result-item";
+    row.dataset.id = r.id;
     const date = new Date(r.createdAt);
     const typeLabel = r.type === "single" ? "Kata" : "Kalimat";
-    row.innerHTML = `<div>${typeLabel}</div><div>${r.score}</div><div>${r.averageTime.toFixed(2)} dtk</div><div>${r.numQuestions}</div><div>${date.toLocaleString()}</div>`;
+    row.innerHTML = `<div>${typeLabel}</div><div>${r.score}</div><div>${r.averageTime.toFixed(2)} dtk</div><div>${r.numQuestions}</div><div>${formatDateTime(date)}</div>`;
     recentResultsEl.appendChild(row);
   });
 }
 
+function pad(n) { return n.toString().padStart(2, "0"); }
+function formatDateTime(d) {
+  const HH = pad(d.getHours());
+  const mm = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  const DD = pad(d.getDate());
+  const MM = pad(d.getMonth() + 1);
+  const YYYY = d.getFullYear();
+  return `${HH}:${mm}:${ss}, ${DD}-${MM}-${YYYY}`;
+}
+
+async function openStoredResultById(id) {
+  if (!db) setupDB();
+  const r = await db.results.get(Number(id));
+  if (!r) return;
+  resultType.textContent = r.type === "single" ? "Kata" : "Kalimat";
+  resultQuestions.textContent = String(r.numQuestions);
+  resultGoal.textContent = String(r.goalSeconds);
+  resultAvg.textContent = r.averageTime.toFixed(2);
+  resultScore.textContent = String(r.score);
+  perQuestionList.innerHTML = "";
+  (r.details || []).forEach((d, i) => {
+    const row = document.createElement("div");
+    row.className = "result-item";
+    row.innerHTML = `<div>${i + 1}</div><div>${d.text}</div><div>${d.time.toFixed(2)} dtk</div><div>${d.score}</div><div>${r.goalSeconds} dtk</div>`;
+    perQuestionList.appendChild(row);
+  });
+  resultModal.classList.remove("hidden");
+}
+
+recentResultsEl.addEventListener("click", (e) => {
+  const item = e.target.closest(".result-item");
+  if (item && item.dataset.id) {
+    openStoredResultById(item.dataset.id);
+  }
+});
 window.addEventListener("load", async () => {
   setTab("dashboard");
   await loadQuizzes();

@@ -79,11 +79,16 @@ html, body {
 }
 .result-item {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 0.6fr 2fr 1fr 1fr 1fr;
   gap: 8px;
   padding: 10px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
+  cursor: pointer;
+}
+.result-item:hover {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
 }
 .menu-grid {
   display: grid;
