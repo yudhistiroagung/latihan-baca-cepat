@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuis Membaca</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Kuis Membaca</h1>
+    <nav class="nav">
+      <button id="dashboardTab" class="tab active">Dasbor</button>
+      <button id="quizTab" class="tab">Mulai Kuis</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="dashboardSection" class="section">
+      <div class="stats-grid">
+        <div class="card">
+          <div class="card-title">Total Kuis</div>
+          <div class="metric" id="totalQuizzes">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Skor Rata-rata</div>
+          <div class="metric" id="averageScore">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Skor Terbaik</div>
+          <div class="metric" id="bestScore">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Berdasarkan Tipe</div>
+          <div class="by-type">
+            <div>Kata: <span id="countSingle">0</span></div>
+            <div>Kalimat: <span id="countSentence">0</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Hasil Terbaru</div>
+        <div id="recentResults" class="results-list"></div>
+      </div>
+    </section>
+
+    <section id="quizSection" class="section hidden">
+      <div class="menu-grid">
+        <button class="menu-card" data-quiz="single">
+          <div class="menu-title">Baca Kata</div>
+          <div class="menu-desc">Satu kata per soal</div>
+        </button>
+        <button class="menu-card" data-quiz="sentence">
+          <div class="menu-title">Baca Kalimat</div>
+          <div class="menu-desc">Kalimat tiga kata per soal</div>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <div id="setupModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle"></div>
+        <button id="closeModal" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="modalDesc"></p>
+        <div class="form">
+          <label class="form-row">
+            <span>Target waktu per soal (detik)</span>
+            <input type="number" id="goalSeconds" min="1" value="5">
+          </label>
+          <label class="form-row">
+            <span>Jumlah soal</span>
+            <input type="number" id="numQuestions" min="1" value="10">
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="startQuizBtn" class="primary-btn">Mulai</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="playOverlay" class="overlay hidden">
+    <div class="overlay-content">
+      <div id="questionText" class="question-text"></div>
+      <div class="overlay-footer">
+        <div class="left">
+          <span id="progressText"></span>
+        </div>
+        <div class="right">
+          <button id="nextBtn" class="next-btn">Lanjut →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Hasil Kuis</div>
+        <button id="closeResult" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="result-grid">
+          <div>
+            <div class="card-title">Tipe</div>
+            <div id="resultType"></div>
+          </div>
+          <div>
+            <div class="card-title">Jumlah Soal</div>
+            <div id="resultQuestions"></div>
+          </div>
+          <div>
+            <div class="card-title">Target (dtk)</div>
+            <div id="resultGoal"></div>
+          </div>
+          <div>
+            <div class="card-title">Rata-rata Waktu (dtk)</div>
+            <div id="resultAvg"></div>
+          </div>
+          <div>
+            <div class="card-title">Skor</div>
+            <div id="resultScore"></div>
+          </div>
+        </div>
+        <div class="card-title">Per Soal</div>
+        <div id="perQuestionList" class="results-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="goDashboard" class="primary-btn">Ke Dasbor</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

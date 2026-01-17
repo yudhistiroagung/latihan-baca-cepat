@@ -1,0 +1,52 @@
+[
+  {
+    "name": "single",
+    "data": [
+      "lari",
+      "jalan",
+      "makan",
+      "baca",
+      "lompat",
+      "main",
+      "senyum",
+      "pikir",
+      "tidur",
+      "minum",
+      "tulis",
+      "gambar",
+      "nyanyi",
+      "tepuk",
+      "berenang",
+      "tertawa",
+      "bicara",
+      "belajar",
+      "lihat",
+      "dengar"
+    ]
+  },
+  {
+    "name": "sentence",
+    "data": [
+      "Aku bisa lari",
+      "Kita makan nasi",
+      "Kamu bisa baca",
+      "Aku suka susu",
+      "Kita akan jalan",
+      "Mereka bisa lompat",
+      "Aku bisa nyanyi",
+      "Kami main bola",
+      "Kamu bisa berenang",
+      "Aku lihat kamu",
+      "Kami gambar kucing",
+      "Kamu tulis bagus",
+      "Aku sangat senang",
+      "Kami belajar matematika",
+      "Kamu tampak baik",
+      "Aku minum air",
+      "Kami masak nasi",
+      "Kamu tepuk tangan",
+      "Aku baca buku",
+      "Kami bicara sekarang"
+    ]
+  }
+]
