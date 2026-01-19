@@ -227,21 +227,11 @@ async function loadDashboard() {
     row.dataset.id = r.id;
     const date = new Date(r.createdAt);
     const typeLabel = r.type === "single" ? "Kata" : "Kalimat";
-    row.innerHTML = `<div>${typeLabel}</div><div>${r.score}</div><div>${r.averageTime.toFixed(2)} dtk</div><div>${r.numQuestions}</div><div>${formatDateTime(date)}</div>`;
+    row.innerHTML = `<div>${typeLabel}</div><div>${r.score}</div><div>${r.averageTime.toFixed(2)} dtk</div><div>${r.numQuestions}</div><div>${dayjs(date).format("dddd, DD MMMM YYYY")}</div>`;
     recentResultsEl.appendChild(row);
   });
 }
 
-function pad(n) { return n.toString().padStart(2, "0"); }
-function formatDateTime(d) {
-  const HH = pad(d.getHours());
-  const mm = pad(d.getMinutes());
-  const ss = pad(d.getSeconds());
-  const DD = pad(d.getDate());
-  const MM = pad(d.getMonth() + 1);
-  const YYYY = d.getFullYear();
-  return `${HH}:${mm}:${ss}, ${DD}-${MM}-${YYYY}`;
-}
 
 async function openStoredResultById(id) {
   if (!db) setupDB();
