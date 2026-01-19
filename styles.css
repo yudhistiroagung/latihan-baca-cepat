@@ -202,7 +202,7 @@ html, body {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr auto auto;
 }
 .question-text {
   font-size: clamp(48px, 8vw, 120px);
@@ -210,6 +210,25 @@ html, body {
   color: #0f172a;
   text-align: center;
   align-self: center;
+}
+.countdown-wrap {
+  padding: 0 16px;
+}
+.countdown-bar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.countdown-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #0ea5e9);
+  opacity: 0.5;
+  transform-origin: left;
+  transform: scaleX(1);
+  transition: transform 0.08s linear;
 }
 .overlay-footer {
   display: grid;

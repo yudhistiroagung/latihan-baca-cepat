@@ -13,6 +13,7 @@ const playOverlay = document.getElementById("playOverlay");
 const questionText = document.getElementById("questionText");
 const progressText = document.getElementById("progressText");
 const nextBtn = document.getElementById("nextBtn");
+const countdownFill = document.getElementById("countdownFill");
 const resultModal = document.getElementById("resultModal");
 const closeResult = document.getElementById("closeResult");
 const goDashboard = document.getElementById("goDashboard");
@@ -35,6 +36,8 @@ let quizState = null;
 let timings = [];
 let scores = [];
 let startTime = 0;
+let countdownRAF = null;
+let countdownStart = 0;
 
 function setTab(tab) {
   if (tab === "dashboard") {
@@ -114,9 +117,11 @@ function showQuestion() {
   questionText.textContent = current;
   progressText.textContent = `${quizState.index + 1} / ${quizState.numQuestions}`;
   startTime = performance.now();
+  startCountdown(quizState.goalSeconds);
 }
 
 function nextQuestion() {
+  cancelCountdown();
   const elapsed = (performance.now() - startTime) / 1000;
   timings.push(elapsed);
   scores.push(computeScore(elapsed, quizState.goalSeconds));
@@ -129,6 +134,7 @@ function nextQuestion() {
 }
 
 function finishQuiz() {
+  cancelCountdown();
   playOverlay.classList.add("hidden");
   const avg = timings.reduce((a, b) => a + b, 0) / timings.length;
   const totalScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
@@ -162,6 +168,35 @@ function finishQuiz() {
   resultModal.classList.remove("hidden");
 }
 
+function startCountdown(seconds) {
+  if (!countdownFill) return;
+  cancelCountdown();
+  countdownStart = performance.now();
+  countdownFill.style.transformOrigin = "left";
+  countdownFill.style.transform = "scaleX(1)";
+  const duration = seconds * 1000;
+  const tick = () => {
+    const t = performance.now() - countdownStart;
+    const pct = Math.max(0, 1 - t / duration);
+    countdownFill.style.transform = `scaleX(${pct})`;
+    if (t < duration) {
+      countdownRAF = requestAnimationFrame(tick);
+    } else {
+      cancelCountdown();
+    }
+  };
+  countdownRAF = requestAnimationFrame(tick);
+}
+
+function cancelCountdown() {
+  if (countdownRAF) {
+    cancelAnimationFrame(countdownRAF);
+    countdownRAF = null;
+  }
+  if (countdownFill) {
+    countdownFill.style.transform = "scaleX(0)";
+  }
+}
 quizSection.addEventListener("click", (e) => {
   const btn = e.target.closest(".menu-card");
   if (btn) {
