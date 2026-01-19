@@ -28,13 +28,14 @@ const averageScoreEl = document.getElementById("averageScore");
 const bestScoreEl = document.getElementById("bestScore");
 const countSingleEl = document.getElementById("countSingle");
 const countSentenceEl = document.getElementById("countSentence");
-const recentResultsEl = document.getElementById("recentResults");
+const recentResultsEl = document.getElementById("recentResultsBody");
 
 let quizzesData = [];
 let selectedType = null;
 let quizState = null;
 let timings = [];
-let scores = [];
+let scores5 = [];
+let scoresRatio = [];
 let startTime = 0;
 let countdownRAF = null;
 let countdownStart = 0;
@@ -101,6 +102,16 @@ function computeScore(elapsed, goal) {
   return Math.round(ratio * 100);
 }
 
+function bucketScore(elapsed, goal) {
+  const p = elapsed / goal;
+  if (p > 0.8) return 5;
+  if (p > 0.6) return 4;
+  if (p > 0.3) return 3;
+  if (p > 0.15) return 2;
+  if (p > 0) return 1;
+  return 0;
+}
+
 function startQuiz() {
   const goalSeconds = Math.max(1, Number(goalSecondsInput.value || 5));
   const numQuestions = Math.max(1, Number(numQuestionsInput.value || 10));
@@ -124,7 +135,8 @@ function nextQuestion() {
   cancelCountdown();
   const elapsed = (performance.now() - startTime) / 1000;
   timings.push(elapsed);
-  scores.push(computeScore(elapsed, quizState.goalSeconds));
+  scoresRatio.push(computeScore(elapsed, quizState.goalSeconds));
+  scores5.push(bucketScore(elapsed, quizState.goalSeconds));
   quizState.index += 1;
   if (quizState.index >= quizState.numQuestions) {
     finishQuiz();
@@ -137,17 +149,18 @@ function finishQuiz() {
   cancelCountdown();
   playOverlay.classList.add("hidden");
   const avg = timings.reduce((a, b) => a + b, 0) / timings.length;
-  const totalScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  const totalRatio = Math.round(scoresRatio.reduce((a, b) => a + b, 0) / scoresRatio.length);
+  const avgScore5 = +(scores5.reduce((a, b) => a + b, 0) / scores5.length).toFixed(2);
   resultType.textContent = quizState.type === "single" ? "Kata" : "Kalimat";
   resultQuestions.textContent = String(quizState.numQuestions);
   resultGoal.textContent = String(quizState.goalSeconds);
   resultAvg.textContent = avg.toFixed(2);
-  resultScore.textContent = String(totalScore);
+  resultScore.textContent = String(avgScore5);
   perQuestionList.innerHTML = "";
   quizState.questions.forEach((q, i) => {
     const row = document.createElement("div");
     row.className = "result-item";
-    row.innerHTML = `<div>${i + 1}</div><div>${q}</div><div>${timings[i].toFixed(2)} dtk</div><div>${scores[i]}</div><div>${quizState.goalSeconds} dtk</div>`;
+    row.innerHTML = `<div>${i + 1}</div><div>${q}</div><div>${timings[i].toFixed(2)} dtk</div><div>${scores5[i]}</div><div>${quizState.goalSeconds} dtk</div>`;
     perQuestionList.appendChild(row);
   });
   saveResult({
@@ -156,11 +169,13 @@ function finishQuiz() {
     goalSeconds: quizState.goalSeconds,
     numQuestions: quizState.numQuestions,
     averageTime: avg,
-    score: totalScore,
+    score: totalRatio,
+    avgScore5,
     details: quizState.questions.map((q, i) => ({
       text: q,
       time: timings[i],
-      score: scores[i]
+      score: scoresRatio[i],
+      score5: scores5[i]
     }))
   }).then(() => {
     loadDashboard();
@@ -257,13 +272,13 @@ async function loadDashboard() {
   countSentenceEl.textContent = String(sentenceCount);
   recentResultsEl.innerHTML = "";
   all.slice(0, 10).forEach((r) => {
-    const row = document.createElement("div");
-    row.className = "result-item";
-    row.dataset.id = r.id;
+    const tr = document.createElement("tr");
+    tr.dataset.id = r.id;
     const date = new Date(r.createdAt);
     const typeLabel = r.type === "single" ? "Kata" : "Kalimat";
-    row.innerHTML = `<div>${typeLabel}</div><div>${r.score}</div><div>${r.averageTime.toFixed(2)} dtk</div><div>${r.numQuestions}</div><div>${dayjs(date).format("dddd, DD MMMM YYYY")}</div>`;
-    recentResultsEl.appendChild(row);
+    const avg5 = r.avgScore5 ?? computeAvgScore5FromDetails(r);
+    tr.innerHTML = `<td>${typeLabel}</td><td>${avg5}</td><td>${r.averageTime.toFixed(2)} dtk</td><td>${r.numQuestions}</td><td>${dayjs(date).format("dddd, DD MMMM YYYY")}</td>`;
+    recentResultsEl.appendChild(tr);
   });
 }
 
@@ -276,23 +291,35 @@ async function openStoredResultById(id) {
   resultQuestions.textContent = String(r.numQuestions);
   resultGoal.textContent = String(r.goalSeconds);
   resultAvg.textContent = r.averageTime.toFixed(2);
-  resultScore.textContent = String(r.score);
+  const avg5 = r.avgScore5 ?? computeAvgScore5FromDetails(r);
+  resultScore.textContent = String(avg5);
   perQuestionList.innerHTML = "";
   (r.details || []).forEach((d, i) => {
     const row = document.createElement("div");
     row.className = "result-item";
-    row.innerHTML = `<div>${i + 1}</div><div>${d.text}</div><div>${d.time.toFixed(2)} dtk</div><div>${d.score}</div><div>${r.goalSeconds} dtk</div>`;
+    const s5 = d.score5 ?? bucketScore(d.time, r.goalSeconds);
+    row.innerHTML = `<div>${i + 1}</div><div>${d.text}</div><div>${d.time.toFixed(2)} dtk</div><div>${s5}</div><div>${r.goalSeconds} dtk</div>`;
     perQuestionList.appendChild(row);
   });
   resultModal.classList.remove("hidden");
 }
 
 recentResultsEl.addEventListener("click", (e) => {
-  const item = e.target.closest(".result-item");
+  const item = e.target.closest("tr");
   if (item && item.dataset.id) {
     openStoredResultById(item.dataset.id);
   }
 });
+
+function computeAvgScore5FromDetails(r) {
+  const d = r.details || [];
+  if (!d.length) return 0;
+  const sum = d.reduce((a, x) => {
+    const val = typeof x.score5 === "number" ? x.score5 : bucketScore(x.time, r.goalSeconds);
+    return a + val;
+  }, 0);
+  return +(sum / d.length).toFixed(2);
+}
 window.addEventListener("load", async () => {
   setTab("dashboard");
   await loadQuizzes();
