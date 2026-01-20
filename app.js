@@ -108,9 +108,7 @@ function computeScore(elapsed, goal) {
 }
 
 function bucketScore(elapsed, goal) {
-  console.log(elapsed, goal);
   const p = 1 - (elapsed / goal);
-  console.log('saved', {elapsed, goal, p});
   if (p >= 0.8) return 5;
   if (p >= 0.6) return 4;
   if (p >= 0.3) return 3;
