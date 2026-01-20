@@ -101,6 +101,10 @@ html, body {
 .results-table tbody tr:hover {
   background: #f0f9ff;
 }
+.star-icon {
+  color: #f59e0b;
+  margin-left: 6px;
+}
 .result-item {
   display: grid;
   grid-template-columns: 0.6fr 2fr 1fr 1fr 1fr;

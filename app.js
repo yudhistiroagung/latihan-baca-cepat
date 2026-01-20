@@ -279,7 +279,7 @@ async function loadDashboard() {
     const date = new Date(r.createdAt);
     const typeLabel = r.type === "single" ? "Kata" : "Kalimat";
     const avg5 = r.avgScore5 ?? computeAvgScore5FromDetails(r);
-    tr.innerHTML = `<td>${typeLabel}</td><td>${avg5}</td><td>${r.averageTime.toFixed(2)} dtk</td><td>${r.numQuestions}</td><td>${dayjs(date).format("dddd, DD MMMM YYYY")}</td>`;
+    tr.innerHTML = `<td>${typeLabel}</td><td><span class="score-val">${avg5}</span><span class="star-icon">★</span></td><td>${r.averageTime.toFixed(2)} dtk</td><td>${r.numQuestions}</td><td>${dayjs(date).format("dddd, DD MMMM YYYY")}</td>`;
     recentResultsEl.appendChild(tr);
   });
 }
