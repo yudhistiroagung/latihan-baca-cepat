@@ -103,12 +103,14 @@ function computeScore(elapsed, goal) {
 }
 
 function bucketScore(elapsed, goal) {
-  const p = elapsed / goal;
-  if (p > 0.8) return 5;
-  if (p > 0.6) return 4;
-  if (p > 0.3) return 3;
-  if (p > 0.15) return 2;
-  if (p > 0) return 1;
+  console.log(elapsed, goal);
+  const p = 1 - (elapsed / goal);
+  console.log('saved', {elapsed, goal, p});
+  if (p >= 0.8) return 5;
+  if (p >= 0.6) return 4;
+  if (p >= 0.3) return 3;
+  if (p >= 0.15) return 2;
+  if (p >= 0) return 1;
   return 0;
 }
 
@@ -160,7 +162,7 @@ function finishQuiz() {
   quizState.questions.forEach((q, i) => {
     const row = document.createElement("div");
     row.className = "result-item";
-    row.innerHTML = `<div>${i + 1}</div><div>${q}</div><div>${timings[i].toFixed(2)} dtk</div><div>${scores5[i]}</div><div>${quizState.goalSeconds} dtk</div>`;
+    row.innerHTML = `<div>${i + 1}</div><div>${q}</div><div>${timings[i].toFixed(2)}/${quizState.goalSeconds} dtk</div><div>Score: ${scores5[i]}</div>`;
     perQuestionList.appendChild(row);
   });
   saveResult({
