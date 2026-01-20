@@ -42,7 +42,10 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title">Hasil Terbaru</div>
+        <div class="card-header">
+          <div class="card-title">Hasil Terbaru</div>
+          <button id="resetHistoryBtn" class="danger-btn">Reset Riwayat</button>
+        </div>
         <table class="results-table">
           <thead>
             <tr>
@@ -150,6 +153,21 @@
       </div>
       <div class="modal-footer">
         <button id="goDashboard" class="primary-btn">Ke Dasbor</button>
+      </div>
+    </div>
+  </div>
+  <div id="resetModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Konfirmasi Reset</div>
+        <button id="closeReset" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Ini akan menghapus semua riwayat kuis dari perangkat ini. Tindakan ini tidak bisa dibatalkan.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="confirmReset" class="danger-btn">Hapus Semua</button>
+        <button id="cancelReset" class="primary-btn">Batal</button>
       </div>
     </div>
   </div>

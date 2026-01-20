@@ -59,6 +59,12 @@ html, body {
   border-radius: 12px;
   padding: 16px;
 }
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
 .card-title {
   font-weight: 600;
   margin-bottom: 8px;
@@ -206,9 +212,18 @@ html, body {
   border-top: 1px solid #e2e8f0;
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
 .primary-btn {
   background: #0ea5e9;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+.danger-btn {
+  background: #ef4444;
   color: #ffffff;
   border: none;
   border-radius: 10px;

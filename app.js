@@ -23,6 +23,11 @@ const resultGoal = document.getElementById("resultGoal");
 const resultAvg = document.getElementById("resultAvg");
 const resultScore = document.getElementById("resultScore");
 const perQuestionList = document.getElementById("perQuestionList");
+const resetHistoryBtn = document.getElementById("resetHistoryBtn");
+const resetModal = document.getElementById("resetModal");
+const closeReset = document.getElementById("closeReset");
+const confirmReset = document.getElementById("confirmReset");
+const cancelReset = document.getElementById("cancelReset");
 const totalQuizzesEl = document.getElementById("totalQuizzes");
 const averageScoreEl = document.getElementById("averageScore");
 const bestScoreEl = document.getElementById("bestScore");
@@ -322,6 +327,21 @@ function computeAvgScore5FromDetails(r) {
   }, 0);
   return +(sum / d.length).toFixed(2);
 }
+resetHistoryBtn.addEventListener("click", () => {
+  resetModal.classList.remove("hidden");
+});
+closeReset.addEventListener("click", () => {
+  resetModal.classList.add("hidden");
+});
+cancelReset.addEventListener("click", () => {
+  resetModal.classList.add("hidden");
+});
+confirmReset.addEventListener("click", async () => {
+  if (!db) setupDB();
+  await db.results.clear();
+  resetModal.classList.add("hidden");
+  await loadDashboard();
+});
 window.addEventListener("load", async () => {
   setTab("dashboard");
   await loadQuizzes();
