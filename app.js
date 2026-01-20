@@ -125,7 +125,8 @@ function startQuiz() {
   const questions = buildQuestions(selectedType, numQuestions);
   quizState = { type: selectedType, goalSeconds, numQuestions, questions, index: 0 };
   timings = [];
-  scores = [];
+  scores5 = [];
+  scoresRatio = [];
   playOverlay.classList.remove("hidden");
   showQuestion();
 }
@@ -167,7 +168,7 @@ function finishQuiz() {
   quizState.questions.forEach((q, i) => {
     const row = document.createElement("div");
     row.className = "result-item";
-    row.innerHTML = `<div>${i + 1}</div><div>${q}</div><div>${timings[i].toFixed(2)}/${quizState.goalSeconds} dtk</div><div>Score: ${scores5[i]}</div>`;
+    row.innerHTML = `<div>${i + 1}</div><div>${q}</div><div>${quizState.goalSeconds} dtk</div><div>${timings[i].toFixed(2)} dtk</div><div><span class="score-val">${scores5[i]}</span><span class="star-icon">★</span></div>`;
     perQuestionList.appendChild(row);
   });
   saveResult({
@@ -305,7 +306,7 @@ async function openStoredResultById(id) {
     const row = document.createElement("div");
     row.className = "result-item";
     const s5 = d.score5 ?? bucketScore(d.time, r.goalSeconds);
-    row.innerHTML = `<div>${i + 1}</div><div>${d.text}</div><div>${d.time.toFixed(2)} dtk</div><div>${s5}</div><div>${r.goalSeconds} dtk</div>`;
+    row.innerHTML = `<div>${i + 1}</div><div>${d.text}</div><div>${r.goalSeconds} dtk</div><div>${d.time.toFixed(2)} dtk</div><div><span class="score-val">${s5}</span><span class="star-icon">★</span></div>`;
     perQuestionList.appendChild(row);
   });
   resultModal.classList.remove("hidden");
