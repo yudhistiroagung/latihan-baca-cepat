@@ -170,6 +170,14 @@ html, body {
   grid-template-rows: auto 1fr auto;
   overflow: hidden;
 }
+#resetModal .modal-content {
+  width: min(480px, 70vw);
+  height: auto;
+  max-height: min(360px, 70vh);
+}
+#resetModal .modal-body {
+  padding: 12px;
+}
 .modal-header {
   display: flex;
   align-items: center;
