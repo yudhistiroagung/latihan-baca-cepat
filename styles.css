@@ -215,6 +215,16 @@ html, body {
   border: 1px solid #cbd5e1;
   border-radius: 8px;
 }
+.form-row.textarea {
+  grid-template-columns: 1fr;
+}
+.form-row textarea {
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  width: 100%;
+  resize: vertical;
+}
 .modal-footer {
   padding: 16px;
   border-top: 1px solid #e2e8f0;

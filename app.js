@@ -17,6 +17,12 @@ const countdownFill = document.getElementById("countdownFill");
 const resultModal = document.getElementById("resultModal");
 const closeResult = document.getElementById("closeResult");
 const goDashboard = document.getElementById("goDashboard");
+const settingsTab = document.getElementById("settingsTab");
+const settingsSection = document.getElementById("settingsSection");
+const settingsWords = document.getElementById("settingsWords");
+const settingsSentences = document.getElementById("settingsSentences");
+const saveSettings = document.getElementById("saveSettings");
+const cancelSettings = document.getElementById("cancelSettings");
 const resultType = document.getElementById("resultType");
 const resultQuestions = document.getElementById("resultQuestions");
 const resultGoal = document.getElementById("resultGoal");
@@ -44,23 +50,24 @@ let scoresRatio = [];
 let startTime = 0;
 let countdownRAF = null;
 let countdownStart = 0;
+let customWords = [];
+let customSentences = [];
 
 function setTab(tab) {
-  if (tab === "dashboard") {
-    dashboardTab.classList.add("active");
-    quizTab.classList.remove("active");
-    dashboardSection.classList.remove("hidden");
-    quizSection.classList.add("hidden");
-  } else {
-    quizTab.classList.add("active");
-    dashboardTab.classList.remove("active");
-    quizSection.classList.remove("hidden");
-    dashboardSection.classList.add("hidden");
-  }
+  dashboardTab.classList.toggle("active", tab === "dashboard");
+  quizTab.classList.toggle("active", tab === "quiz");
+  settingsTab.classList.toggle("active", tab === "settings");
+  dashboardSection.classList.toggle("hidden", tab !== "dashboard");
+  quizSection.classList.toggle("hidden", tab !== "quiz");
+  settingsSection.classList.toggle("hidden", tab !== "settings");
 }
 
 dashboardTab.addEventListener("click", () => setTab("dashboard"));
 quizTab.addEventListener("click", () => setTab("quiz"));
+settingsTab.addEventListener("click", () => {
+  setTab("settings");
+  populateSettingsForm();
+});
 
 async function loadQuizzes() {
   const res = await fetch("quizzes.json");
@@ -92,6 +99,8 @@ function shuffle(arr) {
 function buildQuestions(type, count) {
   const entry = quizzesData.find((q) => q.name === type);
   const pool = entry ? [...entry.data] : [];
+  if (type === "single" && customWords.length) pool.push(...customWords);
+  if (type === "sentence" && customSentences.length) pool.push(...customSentences);
   shuffle(pool);
   const res = [];
   for (let i = 0; i < count; i++) {
@@ -113,8 +122,8 @@ function bucketScore(elapsed, goal) {
   if (p >= 0.6) return 4;
   if (p >= 0.3) return 3;
   if (p >= 0.15) return 2;
-  if (p >= 0) return 1;
-  return 0;
+  
+  return 1;
 }
 
 function startQuiz() {
@@ -246,8 +255,9 @@ goDashboard.addEventListener("click", () => {
 let db = null;
 function setupDB() {
   db = new Dexie("reading_quiz_db");
-  db.version(1).stores({
-    results: "++id,type,createdAt,score"
+  db.version(2).stores({
+    results: "++id,type,createdAt,score",
+    settings: "key"
   });
 }
 
@@ -326,9 +336,56 @@ function computeAvgScore5FromDetails(r) {
   }, 0);
   return +(sum / d.length).toFixed(2);
 }
-resetHistoryBtn.addEventListener("click", () => {
-  resetModal.classList.remove("hidden");
+async function resetHistory() {
+  try {
+    if (!db) setupDB();
+    await db.open();
+    await db.results.clear();
+  } catch (e) {
+    console.error("Reset failed", e);
+  } finally {
+    resetModal.classList.add("hidden");
+    await loadDashboard();
+  }
+}
+async function loadSettings() {
+  if (!db) setupDB();
+  const s = await db.table("settings").get("custom");
+  customWords = s && Array.isArray(s.words) ? s.words : [];
+  customSentences = s && Array.isArray(s.sentences) ? s.sentences : [];
+}
+function populateSettingsForm() {
+  settingsWords.value = (customWords || []).join(", ");
+  settingsSentences.value = (customSentences || []).join(", ");
+}
+function parseCommaList(text) {
+  return text.split(",").map((t) => t.trim()).filter((t) => t.length > 0);
+}
+saveSettings.addEventListener("click", async () => {
+  const words = parseCommaList(settingsWords.value || "");
+  const sentences = parseCommaList(settingsSentences.value || "");
+  if (!db) setupDB();
+  await db.table("settings").put({ key: "custom", words, sentences, updatedAt: Date.now() });
+  customWords = words;
+  customSentences = sentences;
+  setTab("dashboard");
+  await loadDashboard();
 });
+cancelSettings.addEventListener("click", () => {
+  populateSettingsForm();
+  setTab("dashboard");
+});
+window.addEventListener("load", async () => {
+  setTab("dashboard");
+  await loadQuizzes();
+  await loadSettings();
+  await loadDashboard();
+});
+if (resetHistoryBtn) {
+  resetHistoryBtn.addEventListener("click", () => {
+    resetModal.classList.remove("hidden");
+  });
+}
 closeReset.addEventListener("click", () => {
   resetModal.classList.add("hidden");
 });
@@ -336,13 +393,5 @@ cancelReset.addEventListener("click", () => {
   resetModal.classList.add("hidden");
 });
 confirmReset.addEventListener("click", async () => {
-  if (!db) setupDB();
-  await db.results.clear();
-  resetModal.classList.add("hidden");
-  await loadDashboard();
-});
-window.addEventListener("load", async () => {
-  setTab("dashboard");
-  await loadQuizzes();
-  await loadDashboard();
+  await resetHistory();
 });

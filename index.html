@@ -15,6 +15,7 @@
     <nav class="nav">
       <button id="dashboardTab" class="tab active">Dasbor</button>
       <button id="quizTab" class="tab">Mulai Kuis</button>
+      <button id="settingsTab" class="tab">Pengaturan</button>
     </nav>
   </header>
 
@@ -71,6 +72,26 @@
           <div class="menu-title">Baca Kalimat</div>
           <div class="menu-desc">Kalimat tiga kata per soal</div>
         </button>
+      </div>
+    </section>
+    <section id="settingsSection" class="section hidden">
+      <div class="card">
+        <div class="card-title">Pengaturan</div>
+        <p>Halaman ini memungkinkan Anda menambah daftar kata dan kalimat untuk memperluas soal kuis. Pisahkan setiap entri dengan tanda koma.</p>
+        <div class="form">
+          <label class="form-row textarea">
+            <span>Daftar kata (pisah dengan koma)</span>
+            <textarea id="settingsWords" rows="5"></textarea>
+          </label>
+          <label class="form-row textarea">
+            <span>Daftar kalimat (pisah dengan koma)</span>
+            <textarea id="settingsSentences" rows="5"></textarea>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <button id="saveSettings" class="primary-btn">Simpan</button>
+          <button id="cancelSettings" class="danger-btn">Batal</button>
+        </div>
       </div>
     </section>
   </main>
